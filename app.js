@@ -1,5 +1,6 @@
 require("dotenv").config();
-
+const multer = require("multer")
+const path = require("path")
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const app = express();
@@ -14,8 +15,24 @@ const corsOptions = {
   credentials: true, //included credentials as true
 };
 // app.use(cors(corsOptions))
-app.use(cors({ credentials: true, origin: 'http://localhost:8000' }))
+app.use(cors(corsOptions))
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'images')
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().getTime() + '-' + file.originalname)
+  }
+})
 
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg') {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+}
+app.use('/images', express.static(path.join(__dirname, 'images')))
 morganBody(app);
 app.use((error, req, res, next) => {
   return error instanceof SyntaxError
@@ -23,16 +40,9 @@ app.use((error, req, res, next) => {
     : next();
 });
 
-// app.use((req, res, next) => {
-//   res.header('Access-Control-Allow-Origin', 'http://localhost:3001');
-//   res.header('Access-Control-Allow-Credentials', 'true');
-//   res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-//   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-//   console.log('CORS headers set:', req.headers.origin);
-//   next();
-// });
-
 app.use(cookieParser())
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'))
+
 app.disable("x-powered-by");
 app.use(routes);
 

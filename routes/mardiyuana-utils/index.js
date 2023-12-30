@@ -13,6 +13,7 @@ router.all("/connect", (req, res, next) => {
 
 // router.all('/', index);
 router.use("/test", require("./test"));
+router.use("/image", require("./image"));
 
 
 router.all('*', index);
