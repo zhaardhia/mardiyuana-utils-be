@@ -14,6 +14,9 @@ router.all("/connect", (req, res, next) => {
 // router.all('/', index);
 router.use("/test", require("./test"));
 router.use("/image", require("./image"));
+router.use("/dashboard", require("./dashboard"));
+router.use("/event", require("./event"));
+router.use("/announcement", require("./announcement"));
 
 
 router.all('*', index);
