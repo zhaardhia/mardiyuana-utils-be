@@ -11,7 +11,7 @@ const {
 exports.getLatestReminderCourse = async ({ academicYearId, classId }) => {
   return reminder_course.findAll({
     raw: true,
-    attributes: { exclude: ["updatedDate"]},
+    attributes: ["id", "title", "body"],
     where: {
       academicYearId,
       classId
