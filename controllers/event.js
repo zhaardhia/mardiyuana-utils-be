@@ -1,5 +1,5 @@
 const response = require("../components/response")
-const { db, event, event_vote } = require("../components/database");
+const { db, event, event_vote, student } = require("../components/database");
 const { nanoid } = require("nanoid")
 const { getActiveEnrollmentStudent } = require("./query/enrollment_student")
 const { getLatestReminderCourse } = require("./query/reminderCourse")
@@ -51,10 +51,17 @@ exports.getEventVoteDetail = async (req, res, next) => {
     const totalAgree = filterAgree.length
     const totalDisagree = getEventDetailJSON.event_votes.length - totalAgree
 
+    const countStudentActive = await student.count({
+      where: { status: "ACTIVE" }
+    })
+    console.log({countStudentActive})
     return response.res200(res, "000", "success get all dashboard data.", {
       ...getEventDetailJSON,
       totalAgree,
-      totalDisagree
+      totalDisagree,
+      percentageAgree: `${(totalAgree / countStudentActive * 100).toFixed(0)}%`,
+      percentageDisagree: `${(totalDisagree / countStudentActive * 100).toFixed(0)}%`,
+      totalStudent: countStudentActive
     });
   } catch (error) {
     console.error(error)
